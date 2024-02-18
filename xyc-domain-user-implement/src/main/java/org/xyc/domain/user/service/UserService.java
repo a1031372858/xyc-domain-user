@@ -24,7 +24,6 @@ public class UserService {
         QueryWrapper<UserPO> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("phone",phone);
         UserPO userPO = userPOMapper.selectOne(userQueryWrapper);
-        UserTO userTO = userConverter.convertT(userPO);
-        return Response.success(userTO);
+        return Response.success(userConverter.convertT(userPO));
     }
 }

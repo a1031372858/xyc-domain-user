@@ -3,7 +3,7 @@ package org.xyc.domain.user.model.po;
 import lombok.Data;
 import org.xyc.domain.base.model.ModelBase;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author xuyachang
@@ -35,5 +35,5 @@ public class UserPO extends ModelBase {
     /**
      * 最后登录时间
      */
-    private LocalDateTime lastLoginTime;
+    private Date lastLoginTime;
 }
