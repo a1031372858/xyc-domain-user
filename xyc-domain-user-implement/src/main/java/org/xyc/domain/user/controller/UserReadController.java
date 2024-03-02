@@ -23,4 +23,9 @@ public class UserReadController {
     public Response<UserTO> findUserByPhone(@RequestBody UserTO userTO){
         return userService.findUserByPhone(userTO.getPhone());
     }
+
+    @GetMapping("getByPhone")
+    public Response<UserTO> getUserByPhone(UserTO userTO){
+        return userService.findUserByPhone(userTO.getPhone());
+    }
 }
