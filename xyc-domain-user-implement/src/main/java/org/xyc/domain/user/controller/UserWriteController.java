@@ -2,6 +2,7 @@ package org.xyc.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.xyc.domain.base.model.Response;
@@ -21,8 +22,13 @@ public class UserWriteController {
     private final UserService userService;
 
     @PostMapping("register")
-    public Response<Boolean> register(UserTO userTO){
-        return userService.register(userTO);
+    public Response<Boolean> register(@RequestBody UserTO userTO){
+        return Response.success(userService.register(userTO));
     }
 
+
+    @PostMapping("updateById")
+    public Response<Boolean> updateById(@RequestBody UserTO userTO){
+        return Response.success(userService.updateById(userTO));
+    }
 }

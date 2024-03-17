@@ -4,7 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import org.xyc.domain.base.model.Response;
+import org.xyc.domain.base.exception.BusinessException;
+import org.xyc.domain.user.cache.UserCache;
 import org.xyc.domain.user.converter.UserConverter;
 import org.xyc.domain.user.mapper.UserPOMapper;
 import org.xyc.domain.user.model.po.UserPO;
@@ -24,17 +25,30 @@ public class UserService {
     private final UserPOMapper userPOMapper;
     private final UserConverter userConverter;
 
-    public Response<UserTO> findUserByPhone(String phone){
+    private final UserCache userCache;
+
+    public UserTO findUserById(Long id){
+        //从缓存中获取
+        UserPO itemPO = userCache.findById(id);
+        return userConverter.po2to(itemPO);
+    }
+
+    public UserTO findUserByPhone(String phone){
         QueryWrapper<UserPO> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("phone",phone);
         UserPO userPO = userPOMapper.selectOne(userQueryWrapper);
-        return Response.success(userConverter.convertT(userPO));
+        return userConverter.convertT(userPO);
     }
 
 
-    public Response<Boolean> register(UserTO userTO){
+    public Boolean register(UserTO userTO){
         UserPO userPO = new UserPO();
-        userPO.setUsername("new_user" + userTO.getPhone());
+        userPO.setName(userTO.getName());
+        if(Objects.isNull(userTO.getUsername())){
+            userPO.setUsername("new_user" + userTO.getPhone());
+        }else {
+            userPO.setUsername(userTO.getUsername());
+        }
         userPO.setPhone(userTO.getPhone());
         if(Objects.nonNull(userTO.getPassword())){
             userPO.setPassword(DigestUtils.md5DigestAsHex(userTO.getPassword().getBytes(StandardCharsets.UTF_8)));
@@ -43,7 +57,16 @@ public class UserService {
             userPO.setPassword(userTO.getPassword());
         }
         userPOMapper.insert(userPO);
+        return Boolean.TRUE;
+    }
 
-        return Response.success(Boolean.TRUE);
+    public Boolean updateById(UserTO userTO){
+        if(Objects.isNull(userTO) || Objects.isNull(userTO.getId())){
+            throw new BusinessException("入参或id为空");
+        }
+        userPOMapper.updateById(userConverter.to2po(userTO));
+        //删除缓存
+        userCache.invalidate(userTO.getId());
+        return Boolean.TRUE;
     }
 }
