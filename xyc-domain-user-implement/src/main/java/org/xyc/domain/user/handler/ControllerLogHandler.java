@@ -25,7 +25,7 @@ import java.util.Objects;
 @Component
 public class ControllerLogHandler {
 
-    @Pointcut("execution(public * org.xyc.domain.user.controller.*.*(..))")
+    @Pointcut("execution(public * org.xyc.domain.user.controller.*.*(..)) || execution(public * org.xyc.domain.user.facade.*.*(..))")
     public void logPointCut(){};
 
     @Around("logPointCut()")
