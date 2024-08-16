@@ -8,11 +8,11 @@ import org.xyc.domain.user.model.to.UserTO;
 
 /**
  * @author xuyachang
- * @date 2024/5/23
+ * @date 2024/6/23
  */
-@FeignClient(value = "xyc-user",contextId = "UserReadFacade")
-public interface UserReadFacade {
+@FeignClient(value = "xyc-user",contextId = "UserWriteFacade")
+public interface UserWriteFacade {
 
-    @PostMapping("findUserByPhone")
-    Response<UserTO> findUserByPhone(@RequestBody UserTO userTO);
+    @PostMapping("updateUserName")
+    Response<Boolean> updateUserName(@RequestBody UserTO userTO);
 }
