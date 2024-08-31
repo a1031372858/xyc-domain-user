@@ -5,6 +5,7 @@ import org.xyc.domain.base.model.ModelBase;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author xuyachang
@@ -37,4 +38,9 @@ public class UserTO extends ModelBase {
      * 最后登录时间
      */
     private Date lastLoginTime;
+
+    /**
+     * 角色列表
+     */
+    private List<RoleTO> roleTOList;
 }

@@ -7,4 +7,8 @@ package org.xyc.domain.user.common;
 public interface RedisKey {
     String User = "user:user:%d";
 
+    String Role = "user:role:%d";
+
+    String Permission = "user:permission:%d";
+
 }

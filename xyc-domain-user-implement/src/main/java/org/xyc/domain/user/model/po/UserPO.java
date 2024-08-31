@@ -6,6 +6,7 @@ import org.xyc.domain.base.model.ModelBase;
 import java.util.Date;
 
 /**
+ * 用户
  * @author xuyachang
  * @date 2024/2/11
  */

@@ -10,7 +10,7 @@ import org.xyc.domain.base.model.Response;
  * @author xuyachang
  * @date 2024/2/5
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 @Slf4j
 public class WebExceptionHandler {
 

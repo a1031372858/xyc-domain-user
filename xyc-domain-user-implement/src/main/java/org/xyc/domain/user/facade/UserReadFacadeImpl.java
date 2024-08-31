@@ -18,7 +18,7 @@ public class UserReadFacadeImpl implements UserReadFacade{
     private final UserService userService;
 
     @Override
-    public Response<UserTO> findUserByPhone(@RequestBody UserTO userTO){
-        return Response.success(userService.findUserByPhone(userTO.getPhone()));
+    public Response<UserTO> findUserAndPermissionByPhone(@RequestBody UserTO userTO){
+        return Response.success(userService.findUserAndPermissionByPhone(userTO.getPhone()));
     }
 }

@@ -6,41 +6,40 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.xyc.domain.base.cache.BaseCache;
 import org.xyc.domain.user.common.RedisKey;
-import org.xyc.domain.user.mapper.UserPOMapper;
-import org.xyc.domain.user.model.po.UserPO;
+import org.xyc.domain.user.mapper.PermissionPOMapper;
+import org.xyc.domain.user.model.po.PermissionPO;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author xuyachang
- * @date 2024/3/17
+ * @date 2024/8/31
  */
 @Component
 @RequiredArgsConstructor
-public class UserCache implements BaseCache<UserPO> {
+public class PermissionCache implements BaseCache<PermissionPO> {
 
     private final RedisTemplate<String,String> redisTemplate;
 
-    private final UserPOMapper userPOMapper;
-
+    private final PermissionPOMapper permissionPOMapper;
     @Override
-    public UserPO findById(Long id) {
-        String key = String.format(RedisKey.User, id);
+    public PermissionPO findById(Long id) {
+        String key = String.format(RedisKey.Permission, id);
         String redisValue = redisTemplate.opsForValue().get(key);
         if(Objects.isNull(redisValue)){
-            UserPO userPO = userPOMapper.selectById(id);
-            if(Objects.nonNull(userPO)){
-                redisTemplate.opsForValue().set(key,JSON.toJSONString(userPO),3600, TimeUnit.SECONDS);
+            PermissionPO permissionPO = permissionPOMapper.selectById(id);
+            if(Objects.nonNull(permissionPO)){
+                redisTemplate.opsForValue().set(key, JSON.toJSONString(permissionPO),3600, TimeUnit.SECONDS);
             }
-            return userPO;
+            return permissionPO;
         }
-        return JSON.parseObject(redisValue,UserPO.class);
+        return JSON.parseObject(redisValue,PermissionPO.class);
     }
 
     @Override
     public void invalidate(Long id) {
-        String key = String.format(RedisKey.User, id);
+        String key = String.format(RedisKey.Permission, id);
         redisTemplate.delete(key);
     }
 }

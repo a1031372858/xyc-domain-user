@@ -2,16 +2,27 @@ package org.xyc.domain.user.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.xyc.domain.base.exception.BusinessException;
+import org.xyc.domain.user.cache.PermissionCache;
+import org.xyc.domain.user.cache.RoleCache;
 import org.xyc.domain.user.cache.UserCache;
+import org.xyc.domain.user.converter.PermissionConverter;
+import org.xyc.domain.user.converter.RoleConverter;
 import org.xyc.domain.user.converter.UserConverter;
+import org.xyc.domain.user.mapper.RolePermissionPOMapper;
+import org.xyc.domain.user.mapper.RoleRelationPOMapper;
 import org.xyc.domain.user.mapper.UserPOMapper;
-import org.xyc.domain.user.model.po.UserPO;
+import org.xyc.domain.user.model.po.*;
+import org.xyc.domain.user.model.to.PermissionTO;
+import org.xyc.domain.user.model.to.RoleTO;
 import org.xyc.domain.user.model.to.UserTO;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -24,6 +35,16 @@ public class UserService {
 
     private final UserPOMapper userPOMapper;
     private final UserConverter userConverter;
+
+    private final RoleRelationPOMapper roleRelationPOMapper;
+
+    private final RoleCache roleCache;
+    private final PermissionCache permissionCache;
+    private final RolePermissionPOMapper rolePermissionPOMapper;
+
+    private final RoleConverter roleConverter;
+
+    private final PermissionConverter permissionConverter;
 
     private final UserCache userCache;
 
@@ -38,6 +59,41 @@ public class UserService {
         userQueryWrapper.eq("phone",phone);
         UserPO userPO = userPOMapper.selectOne(userQueryWrapper);
         return userConverter.convertT(userPO);
+    }
+
+    public UserTO findUserAndPermissionByPhone(String phone){
+        QueryWrapper<UserPO> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("phone",phone);
+        UserPO userPO = userPOMapper.selectOne(userQueryWrapper);
+        //查用户角色
+        List<RoleTO> roleTOList = new ArrayList<>();
+        QueryWrapper<RoleRelationPO> roleRelationQuery = new QueryWrapper<>();
+        roleRelationQuery.eq("user_id",userPO.getId());
+        List<RoleRelationPO> roleRelationPOS = roleRelationPOMapper.selectList(roleRelationQuery);
+        if(CollectionUtils.isNotEmpty(roleRelationPOS)){
+            roleRelationPOS.forEach(o->{
+                RolePO rolePO = roleCache.findById(o.getRoleId());
+                RoleTO roleTO = roleConverter.convertT(rolePO);
+                //查角色权限
+                List<PermissionTO> permissionTOS = new ArrayList<>();
+                QueryWrapper<RolePermissionPO> rolePermissionPOQuery = new QueryWrapper<>();
+                rolePermissionPOQuery.eq("role_id",rolePO.getId());
+                List<RolePermissionPO> rolePermissionPOS = rolePermissionPOMapper.selectList(rolePermissionPOQuery);
+                if(CollectionUtils.isNotEmpty(rolePermissionPOS)){
+                    rolePermissionPOS.forEach(p->{
+                        PermissionPO permissionPO = permissionCache.findById(p.getPermissionId());
+                        PermissionTO permissionTO = permissionConverter.convertT(permissionPO);
+                        permissionTOS.add(permissionTO);
+                    });
+                }
+                roleTO.setPermissionTOList(permissionTOS);
+                roleTOList.add(roleTO);
+            });
+        }
+
+        UserTO userTO = userConverter.convertT(userPO);
+        userTO.setRoleTOList(roleTOList);
+        return userTO;
     }
 
 

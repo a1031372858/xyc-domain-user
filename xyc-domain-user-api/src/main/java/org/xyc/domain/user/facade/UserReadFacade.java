@@ -13,6 +13,6 @@ import org.xyc.domain.user.model.to.UserTO;
 @FeignClient(value = "xyc-user",contextId = "UserReadFacade")
 public interface UserReadFacade {
 
-    @PostMapping("findUserByPhone")
-    Response<UserTO> findUserByPhone(@RequestBody UserTO userTO);
+    @PostMapping("findUserAndPermissionByPhone")
+    Response<UserTO> findUserAndPermissionByPhone(@RequestBody UserTO userTO);
 }

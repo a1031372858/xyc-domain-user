@@ -6,41 +6,40 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.xyc.domain.base.cache.BaseCache;
 import org.xyc.domain.user.common.RedisKey;
-import org.xyc.domain.user.mapper.UserPOMapper;
-import org.xyc.domain.user.model.po.UserPO;
+import org.xyc.domain.user.mapper.RolePOMapper;
+import org.xyc.domain.user.model.po.RolePO;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author xuyachang
- * @date 2024/3/17
+ * @date 2024/8/31
  */
 @Component
 @RequiredArgsConstructor
-public class UserCache implements BaseCache<UserPO> {
+public class RoleCache implements BaseCache<RolePO> {
 
     private final RedisTemplate<String,String> redisTemplate;
 
-    private final UserPOMapper userPOMapper;
-
+    private final RolePOMapper rolePOMapper;
     @Override
-    public UserPO findById(Long id) {
-        String key = String.format(RedisKey.User, id);
+    public RolePO findById(Long id) {
+        String key = String.format(RedisKey.Role, id);
         String redisValue = redisTemplate.opsForValue().get(key);
         if(Objects.isNull(redisValue)){
-            UserPO userPO = userPOMapper.selectById(id);
-            if(Objects.nonNull(userPO)){
-                redisTemplate.opsForValue().set(key,JSON.toJSONString(userPO),3600, TimeUnit.SECONDS);
+            RolePO rolePO = rolePOMapper.selectById(id);
+            if(Objects.nonNull(rolePO)){
+                redisTemplate.opsForValue().set(key, JSON.toJSONString(rolePO),3600, TimeUnit.SECONDS);
             }
-            return userPO;
+            return rolePO;
         }
-        return JSON.parseObject(redisValue,UserPO.class);
+        return JSON.parseObject(redisValue,RolePO.class);
     }
 
     @Override
     public void invalidate(Long id) {
-        String key = String.format(RedisKey.User, id);
+        String key = String.format(RedisKey.Role, id);
         redisTemplate.delete(key);
     }
 }
